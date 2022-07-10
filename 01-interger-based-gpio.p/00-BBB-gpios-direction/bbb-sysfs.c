@@ -1,0 +1,75 @@
+#include <linux/module.h>
+#include <linux/fs.h>
+#include <linux/uaccess.h>
+#include <linux/cdev.h>
+#include <linux/slab.h>
+#include <linux/device.h>
+#include <linux/gpio.h>
+#include <linux/string.h>
+
+
+
+#define DRIVER_AUTH "DucNguyen nguyenchiduc090999@gmail.com"
+#define DRIVER_DESC "Create kobject in /sys"
+
+struct m_private_dev{
+    struct kobject *kobj_ref; //reference
+}m_dev;
+
+
+//Function prototype
+static int __init sysfs_direction_init(void);
+static void __exit sysfs_direction_exit(void);
+
+//Sysfs function prototype
+static ssize_t sysfs_show(struct kobject *kobj, struct kobj_attribute *attr,char *buf);
+static ssize_t sysfs_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf,size_t count);
+
+struct kobj_attribute m_attr = __ATTR(direction,0660,sysfs_show,sysfs_store);
+
+//Function action
+
+static ssize_t sysfs_show(struct kobject *kobj, struct kobj_attribute *attr,char *buf){
+    pr_info("sysfs read...\n");
+    return 0;
+}
+
+static ssize_t sysfs_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf,size_t count){
+    pr_info("sysfs write...\n");
+    return count;   
+}
+
+static int 
+__init sysfs_direction_init(void){
+    //Create kobject in /sys
+    m_dev.kobj_ref = kobject_create_and_add("bb-gpios",NULL);
+    //Create entry under /sys/bb-gpios/
+    if(sysfs_create_file(m_dev.kobj_ref,&m_attr.attr)){
+        pr_err("Can't create system file\n");
+        goto rm_kobj;
+    }
+
+
+    pr_info("Hello. Initialized successfully\n");
+    return 0;
+
+    rm_kobj:
+        kobject_put(m_dev.kobj_ref);
+        return -1;
+}
+static void
+__exit sysfs_direction_exit(void){
+    sysfs_remove_file(m_dev.kobj_ref,&m_attr.attr);
+    kobject_put(m_dev.kobj_ref);
+
+    pr_info("Goodbye\n");
+}
+
+module_init(sysfs_direction_init);
+module_exit(sysfs_direction_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR(DRIVER_AUTH);
+MODULE_DESCRIPTION(DRIVER_DESC);
+MODULE_VERSION("1.0");
+MODULE_INFO(board,"Beaglebone Black Rev.C");

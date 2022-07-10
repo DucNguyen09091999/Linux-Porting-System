@@ -1,0 +1,1 @@
+cmd_/home/ducnguyen/Working-Space/Linux-Porting-N-System/00-driver-legacy.p/02-button-legacy/button.mod := { echo  /home/ducnguyen/Working-Space/Linux-Porting-N-System/00-driver-legacy.p/02-button-legacy/button.o;  echo; } > /home/ducnguyen/Working-Space/Linux-Porting-N-System/00-driver-legacy.p/02-button-legacy/button.mod
